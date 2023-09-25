@@ -1,26 +1,114 @@
-# data-generator-api
 
-a [Sails v1](https://sailsjs.com) application
+# Data Generator API
+
+A RESTful API for generating random data based on provided structure.
+
+## Features
+
+- Generate random data with a defined structure
+- Support for various data types (string, number, boolean, etc.)
+- Nested data generation (arrays of objects, arrays of arrays)
+- ...
+
+## Installation and Setup
+
+1. Clone the repository.
+2. Install dependencies with `npm install`.
+3. Start the server with `npm start`.
+
+## Usage
+
+### Generate Random Data
+
+Endpoint: `POST /api/generateRandomData`
+
+Request:
+
+```
+{
+  "structure": {
+    "name": "string",
+    "age": "number",
+    "address": {
+      "street": "string",
+      "city": "string",
+      "state": "string",
+      "zip": "string"
+    }
+  },
+  "arrayLength": 3
+}
+```
 
 
-### Links
+Response:
 
-+ [Sails framework documentation](https://sailsjs.com/get-started)
-+ [Version notes / upgrading](https://sailsjs.com/documentation/upgrading)
-+ [Deployment tips](https://sailsjs.com/documentation/concepts/deployment)
-+ [Community support options](https://sailsjs.com/support)
-+ [Professional / enterprise options](https://sailsjs.com/enterprise)
+```
+[
+  {
+    "name": "John Doe",
+    "age": 30,
+    "address": {
+      "street": "123 Main St",
+      "city": "Example City",
+      "state": "CA",
+      "zip": "12345"
+    }
+  },
+  // More generated objects...
+]
+```
 
+### Generate API Key
 
-### Version info
+To generate an API key, make a `POST` request to `/api/generateApiKey` with your email address.
 
-This app was originally generated on Mon Sep 25 2023 14:27:30 GMT+0530 (India Standard Time) using Sails v1.5.4.
+Request:
 
-<!-- Internally, Sails used [`sails-generate@2.0.7`](https://github.com/balderdashy/sails-generate/tree/v2.0.7/lib/core-generators/new). -->
+```
+{
+  "email": "your.email@example.com"
+}
+```
 
+Response:
 
+```
+{
+  "apiKey": "your_generated_api_key"
+}
+```
 
-<!--
-Note:  Generators are usually run using the globally-installed `sails` CLI (command-line interface).  This CLI version is _environment-specific_ rather than app-specific, thus over time, as a project's dependencies are upgraded or the project is worked on by different developers on different computers using different versions of Node.js, the Sails dependency in its package.json file may differ from the globally-installed Sails CLI release it was originally generated with.  (Be sure to always check out the relevant [upgrading guides](https://sailsjs.com/upgrading) before upgrading the version of Sails used by your app.  If you're stuck, [get help here](https://sailsjs.com/support).)
--->
+## Examples
 
+### Example 1
+
+// Example request and response here...
+
+### Example 2
+
+// Example request and response here...
+
+## Contributing
+
+1. Fork the repository.
+2. Create a new branch for your feature (`git checkout -b feature/feature-name`).
+3. Commit your changes (`git commit -m 'Add new feature'`).
+4. Push to the branch (`git push origin feature/feature-name`).
+5. Create a new Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](https://chat.openai.com/c/LICENSE) file for details.
+
+## Badges
+
+[![Build Status](https://travis-ci.com/utsavKhatri/data-generator-api.svg?branch=main)](https://travis-ci.com/utsavKhatri/data-generator-api)
+
+## Contact
+
+For inquiries, contact Utsav Khatri at [utsav@example.com](mailto:utsav@example.com).
+
+## Acknowledgements
+
+* Thanks to the [Faker.js](https://github.com/Marak/Faker.js) library for generating realistic data.
