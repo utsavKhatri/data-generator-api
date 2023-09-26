@@ -7,6 +7,7 @@ import theme from './theme';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ForgotApiKey from './pages/ForgotApiKey';
 import GenerateData from './pages/GenerateData';
+import Profile from './pages/Profile';
 const rootElement = document.getElementById('root');
 const root = createRoot(rootElement);
 const router = createBrowserRouter([
@@ -31,7 +32,11 @@ const router = createBrowserRouter([
   },
   {
     path: 'generate-data',
-    element: <GenerateData/>,
+    element: <GenerateData />,
+  },
+  {
+    path: 'profile',
+    element: <Profile />,
   },
 ]);
 root.render(

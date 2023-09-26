@@ -2,19 +2,28 @@ import { useState } from 'react';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
 import axios from 'axios';
+import { TextField } from '@mui/material';
+import { API } from '../api';
 
+/**
+ * React component that allows users to request a forgotten API key by providing their email address.
+ * @returns {JSX.Element} The ForgotApiKey component.
+ */
 export default function ForgotApiKey() {
   const [email, setEmail] = useState('');
   const [success, setSuccess] = useState(false);
 
+  /**
+   * Handles the form submission.
+   * @param {React.FormEvent<HTMLFormElement>} e - The form event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await axios.post('http://localhost:1337/user/forgot-api-key', {
+      await axios.post(API.FORGOT_API_KEY, {
         email: email,
       });
 
@@ -36,7 +45,9 @@ export default function ForgotApiKey() {
           </Typography>
         ) : (
           <form onSubmit={handleSubmit}>
-            <Input
+            <TextField
+              variant="outlined"
+              label="Email"
               type="email"
               placeholder="Enter your email"
               value={email}

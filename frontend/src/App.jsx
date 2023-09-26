@@ -9,6 +9,8 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 import Alert from '@mui/material/Alert';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { TextField } from '@mui/material';
+import { API } from './api';
 
 export default function App() {
   const [email, setEmail] = useState('');
@@ -19,7 +21,7 @@ export default function App() {
   const generateApiKey = async () => {
     try {
       const response = await axios.request({
-        url: 'http://localhost:1337/user/api-key',
+        url: API.GET_API_KEY,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,7 +51,9 @@ export default function App() {
         <Typography variant="h4" component="h1" gutterBottom>
           Generate API Key
         </Typography>
-        <Input
+        <TextField
+          variant="outlined"
+          label="Email"
           type="email"
           placeholder="Enter your email"
           value={email}
@@ -94,12 +98,30 @@ export default function App() {
           </Box>
         )}
       </Box>
-      <Box sx={{ my: 2, display: 'flex', justifyContent: 'center', gap:2 }}>
-        <Button variant="text" color='secondary' component={Link} to="/forgot-api-key">
+      <Box sx={{ my: 2, display: 'flex', justifyContent: 'center', gap: 2 }}>
+        <Button
+          variant="text"
+          color="secondary"
+          component={Link}
+          to="/forgot-api-key"
+        >
           Forgot API Key
         </Button>
-        <Button variant="outlined" color='thirdary' component={Link} to="/generate-data">
+        <Button
+          variant="outlined"
+          color="thirdary"
+          component={Link}
+          to="/generate-data"
+        >
           Generate Data
+        </Button>
+        <Button
+          variant="text"
+          color="secondary"
+          component={Link}
+          to="/profile"
+        >
+          Profile
         </Button>
       </Box>
     </Container>
