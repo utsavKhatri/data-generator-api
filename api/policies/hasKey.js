@@ -11,6 +11,10 @@ module.exports = async function (req, res, next) {
   if (!isValid) {
     return res.status(403).json({ error: 'Forbidden' }); // Forbidden
   }
+
+  if (isValid.total === 1) {
+    return res.status(403).json({ message: 'You have reached the limit' });
+  }
   req.id = isValid.id;
   next();
 };

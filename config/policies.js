@@ -20,4 +20,11 @@ module.exports.policies = {
   RandomDataController: {
     '*': ['hasKey'],
   },
+  AdminController: {
+    '*': ['isAdmin'],
+  },
+  AuthController: {
+    '*': true,
+    me: ['hasKey'],
+  },
 };

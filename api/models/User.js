@@ -17,7 +17,10 @@ module.exports = {
       unique: true,
       isEmail: true
     },
-
+    total: {
+      type: 'number',
+      defaultsTo: 1000
+    }
   },
 
 };

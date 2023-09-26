@@ -10,17 +10,23 @@ const domains = require('disposable-email-domains');
  * @return {Promise<any>} - A promise that resolves to the generated random data.
  */
 async function generateRandomDataForStructure(structure) {
+  // Check if the structure is a string
   if (typeof structure === 'string') {
+    // If it is a string, generate a random value based on the type of string
     return generateRandomValueByType(structure);
   }
 
+  // Check if the structure is an array
   if (Array.isArray(structure)) {
+    // Extract the object structure and config from the array
     const [objectStructure, config] = structure;
+    // Determine the length of the array
     const arrayLength =
       config && config.arrayLength
         ? parseInt(config.arrayLength)
         : objectStructure.arrayLength;
 
+    // Generate random data for each element in the array
     return await Promise.all(
       Array.from({ length: arrayLength }, () =>
         generateRandomDataForStructure(objectStructure)
@@ -28,16 +34,22 @@ async function generateRandomDataForStructure(structure) {
     );
   }
 
+  // Check if the structure is an object
   if (typeof structure === 'object') {
+    // Create an empty object to store the generated random data
     const result = {};
+    // Iterate over each key in the structure object
     for (const key in structure) {
       if (structure.hasOwnProperty(key)) {
+        // Generate random data for the value associated with the key
         result[key] = await generateRandomDataForStructure(structure[key]);
       }
     }
+    // Return the generated random data object
     return result;
   }
 
+  // Throw an error for unhandled cases
   throw new Error(`Unhandled case for structure: ${structure}`);
 }
 
@@ -48,8 +60,9 @@ async function generateRandomDataForStructure(structure) {
  * @return {Promise<any>} - A promise that resolves to the generated value.
  */
 async function generateRandomValueByType(type) {
+  // Define an object that maps each type to its generator function
   const typeGenerators = {
-    string: () => faker.string.sample(),
+    string: () => generateRandomString(),
     number: async () => await getRandomNumber(1, 100),
     boolean: () => Math.random() < 0.5,
     uuid: () => crypto.randomUUID(),
@@ -73,10 +86,12 @@ async function generateRandomValueByType(type) {
     contact: () => faker.phone.number(),
   };
 
+  // If the type is valid, call the corresponding generator function and return the generated value
   if (typeGenerators[type]) {
     return await typeGenerators[type]();
   }
 
+  // If the type is invalid, throw an error
   throw new Error(`Invalid type: ${type}`);
 }
 
@@ -87,37 +102,82 @@ async function generateRandomValueByType(type) {
  * where each inner array contains random values of various types.
  */
 async function generateArrayOfArrays() {
+  // Generate a random length between 1 and 5
   const length = getRandomNumber(1, 5);
-  return await Promise.all(
-    Array.from({ length }, async () => {
-      const randomType = getRandomType();
-      return randomType === 'arrayOfArray'
-        ? await generateArrayOfArrays()
-        : await generateRandomValueByType(randomType);
-    })
-  );
+
+  // Use Promise.all and Array.from to generate an array of promises
+  const promises = Array.from({ length }, async () => {
+    // Generate a random type
+    const randomType = getRandomType();
+
+    // If the random type is 'arrayOfArray', recursively call generateArrayOfArrays
+    // Otherwise, call generateRandomValueByType to generate a random value of the type
+    return randomType === 'arrayOfArray'
+      ? await generateArrayOfArrays()
+      : await generateRandomValueByType(randomType);
+  });
+
+  // Wait for all promises to resolve and return the resulting array
+  return await Promise.all(promises);
 }
 
+/**
+ * Generates an array of random strings.
+ * The length of the array is a random number between 1 and 5.
+ * Each element in the array is a random string.
+ * @returns {Promise<Array<string>>} The array of random strings.
+ */
 async function generateArrayOfStrings() {
+  // Generate a random number between 1 and 5
   const length = getRandomNumber(1, 5);
-  return await Promise.all(Array.from({ length }, generateRandomString));
+
+  // Create an array with the specified length and fill it with random strings
+  const arrayOfStrings = Array.from({ length }, generateRandomString);
+
+  // Return the array of random strings
+  return await Promise.all(arrayOfStrings);
 }
 
+/**
+ * Generates an array of random numbers.
+ *
+ * @returns {Promise<Array<number>>} A promise that resolves to an array of random numbers.
+ */
 async function generateArrayOfNumbers() {
+  // Generate a random length between 1 and 5
   const length = getRandomNumber(1, 5);
-  return await Promise.all(
-    Array.from({ length }, async () => getRandomNumber(1, 100))
-  );
+
+  // Create an array of promises using Array.from
+  const promises = Array.from({ length }, async () => {
+    // Generate a random number between 1 and 100
+    return getRandomNumber(1, 100);
+  });
+
+  // Wait for all promises to resolve
+  return await Promise.all(promises);
 }
 
+/**
+ * Generates a random string with a length between 5 and 15 characters.
+ * The string can contain uppercase letters, lowercase letters, and digits.
+ *
+ * @returns {string} The randomly generated string.
+ */
 function generateRandomString() {
-  const length = getRandomNumber(5, 15);
-  const characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const vowels = 'aeiou';
+  const consonants = 'bcdfghjklmnpqrstvwxyz';
+
   let result = '';
+  let useVowel = Math.random() < 0.5;
+  const length = Math.floor(Math.random() * 20) + Math.random() * 10; // Generates a random length between 1 and 15
+
   for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
+    const source = useVowel ? vowels : consonants;
+    const nextChar = source.charAt(Math.floor(Math.random() * source.length));
+    result += nextChar;
+    useVowel = !useVowel; // Switch between vowels and consonants
   }
+
   return result;
 }
 

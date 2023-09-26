@@ -49,6 +49,7 @@ module.exports = {
       return res.serverError(error);
     }
   },
+
   /**
    * Sends an email containing the user's API key to the provided email address.
    *
@@ -152,6 +153,37 @@ module.exports = {
         message: 'Api-key sent to your email',
       });
     } catch (error) {
+      console.log(error);
+      return res.serverError(error);
+    }
+  },
+
+  /**
+   * Get user data by ID and return it in a standardized format.
+   * @param {object} req - The request object containing the user ID.
+   * @param {object} res - The response object for returning the user data.
+   */
+  me: async (req, res) => {
+    try {
+      // Find the user data by ID
+      let userData = await User.findOne({
+        where: {
+          id: req.id,
+        },
+        select: ['id', 'email', 'total'],
+      });
+
+      // Reformat the user data
+      userData = {
+        id: userData.id,
+        email: userData.email,
+        'remaining generations': userData.total,
+      };
+
+      // Return the user data in the response
+      return res.ok(userData);
+    } catch (error) {
+      // Log and return any errors
       console.log(error);
       return res.serverError(error);
     }
