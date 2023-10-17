@@ -15,6 +15,7 @@ import 'ace-builds/src-noconflict/theme-tomorrow';
 import 'ace-builds/src-noconflict/ext-beautify';
 import 'ace-builds/src-noconflict/ext-inline_autocomplete';
 import 'ace-builds/src-noconflict/ext-code_lens';
+import { utils, write } from 'xlsx';
 
 export default function GenerateData() {
   const [apiKey, setApiKey] = useState(
@@ -51,6 +52,19 @@ export default function GenerateData() {
     } catch (error) {
       console.error('Error sending request:', error);
     }
+  };
+
+  const generateExcel = () => {
+    const workbook = { Sheets: { 'Sheet1': utils.json_to_sheet(data) }, SheetNames: ['Sheet1'] };
+    const excelBuffer = write(workbook, { bookType: 'xlsx', type: 'array' });
+    const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'generated_data.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
   const handleApiKey = (value) => {
     setApiKey(value);
@@ -114,6 +128,11 @@ export default function GenerateData() {
           <Button variant="contained" type="submit" sx={{ mb: 2 }}>
             Generate Data
           </Button>
+          {data && (
+            <Button variant="contained" sx={{ ml:3, mb: 2 }} onClick={generateExcel}>
+              Generate Excel
+            </Button>
+          )}
         </form>
 
         {success && (

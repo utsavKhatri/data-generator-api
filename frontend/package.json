@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -23,7 +23,8 @@
     "react-ace": "^10.1.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.16.0",
-    "styled-components": "^5.3.11"
+    "styled-components": "^5.3.11",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",
