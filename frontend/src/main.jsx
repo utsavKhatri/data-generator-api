@@ -9,6 +9,7 @@ import ForgotApiKey from './pages/ForgotApiKey';
 import GenerateData from './pages/GenerateData';
 import Profile from './pages/Profile';
 const rootElement = document.getElementById('root');
+import '@fontsource/roboto/400.css';
 const root = createRoot(rootElement);
 const router = createBrowserRouter([
   {

@@ -10,47 +10,38 @@ const domains = require('disposable-email-domains');
  * @return {Promise<any>} - A promise that resolves to the generated random data.
  */
 async function generateRandomDataForStructure(structure) {
-  // Check if the structure is a string
-  if (typeof structure === 'string') {
-    // If it is a string, generate a random value based on the type of string
-    return generateRandomValueByType(structure);
-  }
-
-  // Check if the structure is an array
-  if (Array.isArray(structure)) {
-    // Extract the object structure and config from the array
-    const [objectStructure, config] = structure;
-    // Determine the length of the array
-    const arrayLength =
-      config && config.arrayLength
-        ? parseInt(config.arrayLength)
-        : objectStructure.arrayLength;
-
-    // Generate random data for each element in the array
-    return await Promise.all(
-      Array.from({ length: arrayLength }, () =>
-        generateRandomDataForStructure(objectStructure)
-      )
-    );
-  }
-
-  // Check if the structure is an object
-  if (typeof structure === 'object') {
-    // Create an empty object to store the generated random data
-    const result = {};
-    // Iterate over each key in the structure object
-    for (const key in structure) {
-      if (structure.hasOwnProperty(key)) {
-        // Generate random data for the value associated with the key
-        result[key] = await generateRandomDataForStructure(structure[key]);
-      }
+  try {
+    if (typeof structure === 'string') {
+      return await generateRandomValueByType(structure);
     }
-    // Return the generated random data object
-    return result;
-  }
 
-  // Throw an error for unhandled cases
-  throw new Error(`Unhandled case for structure: ${structure}`);
+    if (Array.isArray(structure)) {
+      const [objectStructure, config] = structure;
+      const arrayLength =
+        config && config.arrayLength
+          ? parseInt(config.arrayLength)
+          : objectStructure.arrayLength;
+      return await Promise.all(
+        Array.from({ length: arrayLength }, () =>
+          generateRandomDataForStructure(objectStructure)
+        )
+      );
+    }
+
+    if (typeof structure === 'object') {
+      const result = {};
+      for (const key in structure) {
+        if (structure.hasOwnProperty(key)) {
+          result[key] = await generateRandomDataForStructure(structure[key]);
+        }
+      }
+      return result;
+    }
+
+    throw new Error(`Unhandled case for structure: ${structure}`);
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }
 
 /**
@@ -60,39 +51,49 @@ async function generateRandomDataForStructure(structure) {
  * @return {Promise<any>} - A promise that resolves to the generated value.
  */
 async function generateRandomValueByType(type) {
-  // Define an object that maps each type to its generator function
-  const typeGenerators = {
-    string: () => generateRandomString(),
-    number: async () => await getRandomNumber(1, 100),
-    boolean: () => Math.random() < 0.5,
-    uuid: () => crypto.randomUUID(),
-    arrayOfString: async () => await generateArrayOfStrings(),
-    arrayOfNumber: async () => await generateArrayOfNumbers(),
-    arrayOfArray: async () => await generateArrayOfArrays(),
-    date: () => faker.date.past(),
-    email: () => faker.internet.email(),
-    address: () => ({
-      street: faker.location.buildingNumber(),
-      city: faker.location.city(),
-      state: faker.location.state(),
-      zip: faker.location.zipCode(),
-    }),
-    name: () => faker.person.firstName(),
-    fullName: () => faker.person.fullName(),
-    slug: () => faker.lorem.slug(),
-    longText: () => faker.lorem.paragraphs(3),
-    website: () => faker.internet.url(),
-    ip: () => faker.internet.ip(),
-    contact: () => faker.phone.number(),
-  };
+  try {
+    const typeGenerators = {
+      string: generateRandomString,
+      number: getRandomNumber.bind(null, 1, 100),
+      boolean: () => Math.random() < 0.5,
+      uuid: crypto.randomUUID,
+      arrayOfString: generateArrayOfStrings,
+      arrayOfNumber: generateArrayOfNumbers,
+      arrayOfArray: generateArrayOfArrays,
+      date: faker.date.past,
+      email: faker.internet.email,
+      address: () => ({
+        street: faker.location.buildingNumber(),
+        city: faker.location.city(),
+        state: faker.location.state(),
+        zip: faker.location.zipCode(),
+      }),
+      name: faker.person.firstName,
+      fullName: faker.person.fullName,
+      slug: faker.lorem.slug,
+      longText: () => faker.lorem.paragraphs(3),
+      website: faker.internet.url,
+      ip: faker.internet.ip,
+      contact: faker.phone.number,
+      flightNumber: faker.airline.flightNumber,
+      displayNumber: faker.internet.displayName,
+      domain: faker.internet.domainName,
+      fileName: faker.system.commonFileName,
+      geoLocation: faker.location.nearbyGPSCoordinate,
+      ObjectId: faker.database.mongodbObjectId,
+      dbColumnName: faker.database.column,
+    };
 
-  // If the type is valid, call the corresponding generator function and return the generated value
-  if (typeGenerators[type]) {
-    return await typeGenerators[type]();
+    const generator = typeGenerators[type];
+
+    if (generator) {
+      return await generator();
+    }
+
+    throw new Error(`Invalid type: ${type}`);
+  } catch (error) {
+    throw new Error(error.message);
   }
-
-  // If the type is invalid, throw an error
-  throw new Error(`Invalid type: ${type}`);
 }
 
 /**

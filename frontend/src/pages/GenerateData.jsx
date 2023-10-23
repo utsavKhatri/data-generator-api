@@ -1,14 +1,21 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import Button from '@mui/material-next/Button';
+
 import axios from 'axios';
-import { Breadcrumbs, Link, TextField } from '@mui/material';
+import {
+  Alert,
+  Breadcrumbs,
+  Link,
+  Slide,
+  Snackbar,
+  TextField,
+} from '@mui/material';
 import { Link as HrefLink } from 'react-router-dom';
 import { API } from '../api';
 import AceEditor from 'react-ace';
-
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-solarized_light';
 import 'ace-builds/src-noconflict/theme-tomorrow';
@@ -25,6 +32,9 @@ export default function GenerateData() {
   const [arrayLength, setArrayLength] = useState('');
   const [success, setSuccess] = useState(false);
   const [data, setData] = useState(null);
+  const [open, setOpen] = React.useState(false);
+  const [errMessage, setErrMessage] = useState('');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log({
@@ -50,14 +60,27 @@ export default function GenerateData() {
       setData(response.data);
       setSuccess(true);
     } catch (error) {
+      setOpen(true);
+      setErrMessage(error.response?.data?.message);
       console.error('Error sending request:', error);
     }
   };
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
 
+    setOpen(false);
+  };
   const generateExcel = () => {
-    const workbook = { Sheets: { 'Sheet1': utils.json_to_sheet(data) }, SheetNames: ['Sheet1'] };
+    const workbook = {
+      Sheets: { Sheet1: utils.json_to_sheet(data) },
+      SheetNames: ['Sheet1'],
+    };
     const excelBuffer = write(workbook, { bookType: 'xlsx', type: 'array' });
-    const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const dataBlob = new Blob([excelBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
@@ -70,8 +93,24 @@ export default function GenerateData() {
     setApiKey(value);
     localStorage.setItem('user-apiKey', value);
   };
+
   return (
     <Container maxWidth="lg">
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        message={errMessage}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        TransitionComponent={(props) => <Slide {...props} direction="down" />}
+      >
+        <Alert severity="error" onClick={handleClose}>
+          {errMessage}
+        </Alert>
+      </Snackbar>
       <Breadcrumbs aria-label="breadcrumb">
         <Link underline="hover" color="inherit" component={HrefLink} to="/">
           Home
@@ -125,11 +164,25 @@ export default function GenerateData() {
             required
             sx={{ my: 2 }}
           />
-          <Button variant="contained" type="submit" sx={{ mb: 2 }}>
+          <Button
+            variant="filledTonal"
+            type="submit"
+            sx={{
+              mb: 2,
+              background: '#16c2f2',
+              '&:hover': { background: '#04a7d4', color:"white" },
+            }}
+          >
             Generate Data
           </Button>
           {data && (
-            <Button variant="contained" sx={{ ml:3, mb: 2 }} onClick={generateExcel}>
+            <Button
+              variant="filledTonal"
+              sx={{ ml: 3, mb: 2 }}
+              onClick={generateExcel}
+              disabled={data.length === 0}
+              color="success"
+            >
               Generate Excel
             </Button>
           )}
@@ -151,6 +204,10 @@ export default function GenerateData() {
               enableSnippets: true,
               showLineNumbers: true,
               tabSize: 2,
+              useElasticTabstops: true,
+              useWorker:true,
+              vScrollBarAlwaysVisible:false,
+              hScrollBarAlwaysVisible:false
             }}
             readOnly
             width="100%"
