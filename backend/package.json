@@ -5,7 +5,9 @@
   "description": "a Sails application",
   "keywords": [],
   "dependencies": {
+    "@ngneat/falso": "^7.1.1",
     "@sailshq/lodash": "^3.10.3",
+    "chance": "^1.1.11",
     "disposable-email-domains": "^1.0.62",
     "dotenv": "^16.3.1",
     "mongo": "^0.1.0",

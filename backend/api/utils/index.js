@@ -2,7 +2,10 @@ const { faker } = require('@faker-js/faker');
 const crypto = require('crypto');
 const dns = require('node:dns');
 const domains = require('disposable-email-domains');
-
+const Chance = require('chance');
+const chance = new Chance(Math.random());
+const falso = require('@ngneat/falso');
+const { types } = require('../../config/supportedType');
 /**
  * Generates random data for a given structure.
  *
@@ -53,14 +56,10 @@ async function generateRandomDataForStructure(structure) {
 async function generateRandomValueByType(type) {
   try {
     const typeGenerators = {
-      string: generateRandomString,
-      number: getRandomNumber.bind(null, 1, 100),
-      boolean: () => Math.random() < 0.5,
       uuid: crypto.randomUUID,
       arrayOfString: generateArrayOfStrings,
       arrayOfNumber: generateArrayOfNumbers,
       arrayOfArray: generateArrayOfArrays,
-      date: faker.date.past,
       email: faker.internet.email,
       address: () => ({
         street: faker.location.buildingNumber(),
@@ -71,23 +70,35 @@ async function generateRandomValueByType(type) {
       name: faker.person.firstName,
       fullName: faker.person.fullName,
       slug: faker.lorem.slug,
-      longText: () => faker.lorem.paragraphs(3),
       website: faker.internet.url,
       ip: faker.internet.ip,
-      contact: faker.phone.number,
-      flightNumber: faker.airline.flightNumber,
-      displayNumber: faker.internet.displayName,
       domain: faker.internet.domainName,
       fileName: faker.system.commonFileName,
       geoLocation: faker.location.nearbyGPSCoordinate,
       ObjectId: faker.database.mongodbObjectId,
       dbColumnName: faker.database.column,
+      ...types.falso,
+      ...types.chance,
     };
 
-    const generator = typeGenerators[type];
+    if (type.startsWith('New.')) {
+      const generator = typeGenerators[type];
+      if (generator) {
+        console.log('generator 1', generator);
+        return await falso[generator]();
+      }
+    } else if (type.startsWith('Pro.')) {
+      const generator = typeGenerators[type];
+      if (generator) {
+        return await chance[generator]();
+      }
+    } else {
+      const generator = typeGenerators[type];
+      if (generator) {
+        console.log('generator 3', generator);
 
-    if (generator) {
-      return await generator();
+        return await generator();
+      }
     }
 
     throw new Error(`Invalid type: ${type}`);
@@ -133,7 +144,7 @@ async function generateArrayOfStrings() {
   const length = getRandomNumber(1, 5);
 
   // Create an array with the specified length and fill it with random strings
-  const arrayOfStrings = Array.from({ length }, generateRandomString);
+  const arrayOfStrings = Array.from({ length }, chance.string());
 
   // Return the array of random strings
   return await Promise.all(arrayOfStrings);
@@ -156,30 +167,6 @@ async function generateArrayOfNumbers() {
 
   // Wait for all promises to resolve
   return await Promise.all(promises);
-}
-
-/**
- * Generates a random string with a length between 5 and 15 characters.
- * The string can contain uppercase letters, lowercase letters, and digits.
- *
- * @returns {string} The randomly generated string.
- */
-function generateRandomString() {
-  const vowels = 'aeiou';
-  const consonants = 'bcdfghjklmnpqrstvwxyz';
-
-  let result = '';
-  let useVowel = Math.random() < 0.5;
-  const length = Math.floor(Math.random() * 20) + Math.random() * 10; // Generates a random length between 1 and 15
-
-  for (let i = 0; i < length; i++) {
-    const source = useVowel ? vowels : consonants;
-    const nextChar = source.charAt(Math.floor(Math.random() * source.length));
-    result += nextChar;
-    useVowel = !useVowel; // Switch between vowels and consonants
-  }
-
-  return result;
 }
 
 function getRandomNumber(min, max) {
@@ -313,7 +300,6 @@ module.exports = {
   generateArrayOfArrays,
   generateArrayOfStrings,
   generateArrayOfNumbers,
-  generateRandomString,
   getRandomNumber,
   getRandomType,
   generateRandomDataForStructure,

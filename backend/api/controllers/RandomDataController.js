@@ -4,6 +4,7 @@
  * @description :: Server-side actions for handling incoming requests.
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
+const { types } = require('../../config/supportedType');
 const { generateRandomDataForStructure } = require('../utils');
 const { ObjectId } = require('mongodb');
 
@@ -51,6 +52,16 @@ module.exports = {
       console.error(error);
 
       // Handle any errors that occur during the generation process
+      return res.serverError({
+        message: error.message,
+      });
+    }
+  },
+
+  getTypes: async (req, res) => {
+    try {
+      return res.ok(types);
+    } catch (error) {
       return res.serverError({
         message: error.message,
       });

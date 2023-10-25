@@ -11,6 +11,7 @@ import {
   Link,
   Slide,
   Snackbar,
+  Stack,
   TextField,
 } from '@mui/material';
 import { Link as HrefLink } from 'react-router-dom';
@@ -23,6 +24,8 @@ import 'ace-builds/src-noconflict/ext-beautify';
 import 'ace-builds/src-noconflict/ext-inline_autocomplete';
 import 'ace-builds/src-noconflict/ext-code_lens';
 import { utils, write } from 'xlsx';
+import Sidebar from '../components/Sidebar';
+import Badge from '@mui/material-next/Badge';
 
 export default function GenerateData() {
   const [apiKey, setApiKey] = useState(
@@ -118,9 +121,12 @@ export default function GenerateData() {
         <Typography color="text.primary">Generate Data</Typography>
       </Breadcrumbs>
       <Box sx={{ my: 2 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Generate Data
-        </Typography>
+        <Stack direction="row" my={2} spacing={3} alignItems={'center'}>
+          <Typography variant="h4" component="h1" mb={0} gutterBottom>
+            Generate Data
+          </Typography>
+          <Sidebar />
+        </Stack>
 
         <form onSubmit={handleSubmit}>
           <TextField
@@ -170,7 +176,7 @@ export default function GenerateData() {
             sx={{
               mb: 2,
               background: '#16c2f2',
-              '&:hover': { background: '#04a7d4', color:"white" },
+              '&:hover': { background: '#04a7d4', color: 'white' },
             }}
           >
             Generate Data
@@ -205,9 +211,9 @@ export default function GenerateData() {
               showLineNumbers: true,
               tabSize: 2,
               useElasticTabstops: true,
-              useWorker:true,
-              vScrollBarAlwaysVisible:false,
-              hScrollBarAlwaysVisible:false
+              useWorker: true,
+              vScrollBarAlwaysVisible: false,
+              hScrollBarAlwaysVisible: false,
             }}
             readOnly
             width="100%"

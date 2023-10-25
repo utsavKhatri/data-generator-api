@@ -16,4 +16,5 @@ module.exports.routes = {
   'GET /admin/users': 'AdminController.getUser',
   'GET /admin/user/:id': 'AdminController.getUserData',
   'GET /admin/user/data/:id': 'AdminController.getSingleUserData',
+  'GET /get/types':'RandomDataController.getTypes',
 };
